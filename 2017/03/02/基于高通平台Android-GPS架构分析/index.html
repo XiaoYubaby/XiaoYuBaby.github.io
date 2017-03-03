@@ -1,28 +1,412 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <title>XiaoYubaby&#39;s Blog</title>
-  <subtitle>心有猛虎 细嗅蔷薇</subtitle>
-  <link href="/atom.xml" rel="self"/>
+<!doctype html>
+
+
+
   
-  <link href="xiaoyubaby.github.io/"/>
-  <updated>2017-03-02T03:24:52.688Z</updated>
-  <id>xiaoyubaby.github.io/</id>
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-  <author>
-    <name>Eason Zhang</name>
-    <email>easonzxp@sina.com</email>
-  </author>
   
-  <generator uri="http://hexo.io/">Hexo</generator>
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
   
-  <entry>
-    <title>基于高通平台Android-GPS架构分析</title>
-    <link href="xiaoyubaby.github.io/2017/03/02/%E5%9F%BA%E4%BA%8E%E9%AB%98%E9%80%9A%E5%B9%B3%E5%8F%B0Android-GPS%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90/"/>
-    <id>xiaoyubaby.github.io/2017/03/02/基于高通平台Android-GPS架构分析/</id>
-    <published>2017-03-02T02:47:20.389Z</published>
-    <updated>2017-03-02T03:24:52.688Z</updated>
+  
+  
+  
+
+  
     
-    <content type="html"><![CDATA[<h2 id="Android-GPS-框架"><a href="#Android-GPS-框架" class="headerlink" title="Android GPS 框架"></a>Android GPS 框架</h2><hr>
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="android,gps," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="XiaoYubaby's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Android GPS 框架
+下图是基于高通平台GPS实现的基本框架图，因为高通SOC多核机制，GPS事务处理的核心是在Modem侧的核上，下文我们只分析在AP核上的实现部分，意在分析Android部分的实现。
+
+应用层通过LM调用android location
+在Android中，定位服务提供给应用层的 API 位于 android.location 包中，它其中包含的类和接口如下所示：
+
+对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于高通平台Android-GPS架构分析">
+<meta property="og:url" content="xiaoyubaby.github.io/2017/03/02/基于高通平台Android-GPS架构分析/index.html">
+<meta property="og:site_name" content="XiaoYubaby's Blog">
+<meta property="og:description" content="Android GPS 框架
+下图是基于高通平台GPS实现的基本框架图，因为高通SOC多核机制，GPS事务处理的核心是在Modem侧的核上，下文我们只分析在AP核上的实现部分，意在分析Android部分的实现。
+
+应用层通过LM调用android location
+在Android中，定位服务提供给应用层的 API 位于 android.location 包中，它其中包含的类和接口如下所示：
+
+对">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/f92wns8h1ptldeabtmykyqxu/Gps.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/rwjtqc3ztzouii6hzge59a2o/android_location.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/q0nqvduldvk847g82k2g3dqw/android_location.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/pm6ttuqw77eu3ohi6vcccu96/LocationProviderInterfaces.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/cveczwhroarioo5ip4ryuxuj/LocationProviderInterfaces.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/87c93ypt4ho56vxkscjuj3nw/GpsLP_Interfaces.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/rktpv9cndc3t1q1jg9wdfr4b/GpsLp_handleInterfaces.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/ill34vgesjtvnblzi9s2444l/GpsLP_native_methods.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/81h614p9zhw71roi7rawlsx4/GpsLP_jni_callback_methods.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/t9dgna2xtifg5h1i7m3t3r91/GpsLP_JNI.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/pgrz91p83fyt7mkiec7iso0p/GPS%20%E5%90%AF%E5%8A%A8.png">
+<meta property="og:image" content="http://static.zybuluo.com/EasonZxp/xmnp8gvzv8wwn3bn6djn3e3i/Gps_Location_report.png">
+<meta property="og:updated_time" content="2017-03-02T03:24:52.688Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于高通平台Android-GPS架构分析">
+<meta name="twitter:description" content="Android GPS 框架
+下图是基于高通平台GPS实现的基本框架图，因为高通SOC多核机制，GPS事务处理的核心是在Modem侧的核上，下文我们只分析在AP核上的实现部分，意在分析Android部分的实现。
+
+应用层通过LM调用android location
+在Android中，定位服务提供给应用层的 API 位于 android.location 包中，它其中包含的类和接口如下所示：
+
+对">
+<meta name="twitter:image" content="http://static.zybuluo.com/EasonZxp/f92wns8h1ptldeabtmykyqxu/Gps.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="xiaoyubaby.github.io/2017/03/02/基于高通平台Android-GPS架构分析/"/>
+
+
+
+
+
+  <title> 基于高通平台Android-GPS架构分析 | XiaoYubaby's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">XiaoYubaby's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">心有猛虎 细嗅蔷薇</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="xiaoyubaby.github.io/2017/03/02/基于高通平台Android-GPS架构分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Eason Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="XiaoYubaby's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于高通平台Android-GPS架构分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-02T10:47:20+08:00">
+                2017-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android技术总结/" itemprop="url" rel="index">
+                    <span itemprop="name">Android技术总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/02/基于高通平台Android-GPS架构分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/02/基于高通平台Android-GPS架构分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Android-GPS-框架"><a href="#Android-GPS-框架" class="headerlink" title="Android GPS 框架"></a>Android GPS 框架</h2><hr>
 <p>下图是基于高通平台GPS实现的基本框架图，因为高通SOC多核机制，GPS事务处理的核心是在Modem侧的核上，下文我们只分析在AP核上的实现部分，意在分析Android部分的实现。</p>
 <p><img src="http://static.zybuluo.com/EasonZxp/f92wns8h1ptldeabtmykyqxu/Gps.png" alt="Gps.png-35.3kB"></p>
 <h2 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h2><h3 id="通过LM调用android-location"><a href="#通过LM调用android-location" class="headerlink" title="通过LM调用android location"></a>通过LM调用android location</h3><hr>
@@ -148,20 +532,351 @@
 </ul>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
 <p><a href="http://www.ibm.com/developerworks/cn/opensource/os-cn-android-location/" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/opensource/os-cn-android-location/</a><br><a href="http://blog.csdn.net/dreamback1987/article/details/46712699" target="_blank" rel="external">http://blog.csdn.net/dreamback1987/article/details/46712699</a><br><a href="http://androiddoc.qiniudn.com/reference/android/location/package-summary.html" target="_blank" rel="external">http://androiddoc.qiniudn.com/reference/android/location/package-summary.html</a></p>
-]]></content>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android-gps/" rel="tag"># android,gps</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
     
-    <summary type="html">
+      <div class="ds-thread" data-thread-key="2017/03/02/基于高通平台Android-GPS架构分析/"
+           data-title="基于高通平台Android-GPS架构分析" data-url="xiaoyubaby.github.io/2017/03/02/基于高通平台Android-GPS架构分析/">
+      </div>
     
-      &lt;h2 id=&quot;Android-GPS-框架&quot;&gt;&lt;a href=&quot;#Android-GPS-框架&quot; class=&quot;headerlink&quot; title=&quot;Android GPS 框架&quot;&gt;&lt;/a&gt;Android GPS 框架&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;下图是基于高通平台GPS实现的基本
-    
-    </summary>
-    
-      <category term="Android技术总结" scheme="xiaoyubaby.github.io/categories/Android%E6%8A%80%E6%9C%AF%E6%80%BB%E7%BB%93/"/>
-    
-    
-      <category term="android,gps" scheme="xiaoyubaby.github.io/tags/android-gps/"/>
-    
-  </entry>
+  </div>
+
+
+        </div>
+        
+          
   
-</feed>
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Eason Zhang" />
+          <p class="site-author-name" itemprop="name">Eason Zhang</p>
+           
+              <p class="site-description motion-element" itemprop="description">Get busy living, or get busy dying...</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/XiaoYubaby" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-GPS-框架"><span class="nav-number">1.</span> <span class="nav-text">Android GPS 框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用层"><span class="nav-number">2.</span> <span class="nav-text">应用层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过LM调用android-location"><span class="nav-number">2.1.</span> <span class="nav-text">通过LM调用android location</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LocationManager-LM-代理"><span class="nav-number">2.2.</span> <span class="nav-text">LocationManager(LM)代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#框架层"><span class="nav-number">3.</span> <span class="nav-text">框架层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LocationManagerService-LMS-分析"><span class="nav-number">3.1.</span> <span class="nav-text">LocationManagerService(LMS)分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#loadProvidersLocked"><span class="nav-number">3.1.1.</span> <span class="nav-text">loadProvidersLocked</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ProviderProxy描述"><span class="nav-number">3.1.2.</span> <span class="nav-text">ProviderProxy描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LocationProviderInterface描述"><span class="nav-number">3.1.3.</span> <span class="nav-text">LocationProviderInterface描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GpsLocationProvider实现"><span class="nav-number">3.1.4.</span> <span class="nav-text">GpsLocationProvider实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#共享库层"><span class="nav-number">4.</span> <span class="nav-text">共享库层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JNI"><span class="nav-number">4.1.</span> <span class="nav-text">JNI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高通平台为例简要分析其HAL层实现"><span class="nav-number">4.2.</span> <span class="nav-text">高通平台为例简要分析其HAL层实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPS使能流程图"><span class="nav-number">5.</span> <span class="nav-text">GPS使能流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定位信息上报流程图"><span class="nav-number">6.</span> <span class="nav-text">定位信息上报流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高通AGPS配置"><span class="nav-number">7.</span> <span class="nav-text">高通AGPS配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#QXDM-GPSlog抓取方法"><span class="nav-number">7.1.</span> <span class="nav-text">QXDM GPSlog抓取方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#QCAT-分析星历信息"><span class="nav-number">7.2.</span> <span class="nav-text">QCAT 分析星历信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Eason Zhang</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"XiaoYubaby"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
